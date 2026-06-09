@@ -1,10 +1,13 @@
 "use client";
 
+import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConvexError } from "convex/values";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +17,15 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthButtons } from "@/features/auth/components/auth-buttons";
+import { PasswordAuthFlow } from "@/features/auth/types";
 import { SignUpFormData, signUpSchema } from "@/features/auth/validators";
 
 export function SignUpForm() {
+  const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const { signIn } = useAuthActions();
+  const flow: PasswordAuthFlow = "signUp";
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -31,15 +38,29 @@ export function SignUpForm() {
     mode: "onSubmit",
   });
 
-  const isPending = false; // Replace with actual pending state from your authentication logic
+  const onSubmit = (formData: SignUpFormData) => {
+    startTransition(async () => {
+      try {
+        const { name, email, password } = formData;
+        await signIn("password", { name, email, password, flow });
+        // Reset the form after successful sign-up to clear the input fields
+        form.reset();
+        toast.success("Account created successfully");
+      } catch (error) {
+        let errorMessage: string;
+        if (error instanceof ConvexError && error.data === "INVALID_PASSWORD") {
+          errorMessage = "Invalid password - check the requirements and try again.";
+        } else {
+          errorMessage = "Failed to create account. Please check your details and try again.";
+        }
 
-  const onSubmit = (data: SignUpFormData) => {
-    // Handle form submission, e.g., call your sign-up API
-    console.log("Form Data:", data);
+        toast.error(errorMessage);
+      }
+    });
   };
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-xl">Sign Up</CardTitle>
         <CardDescription>Create a new account</CardDescription>
@@ -165,7 +186,11 @@ export function SignUpForm() {
             {isPending ? "Signing Up..." : "Sign Up"}
           </Button>
 
-          <Separator />
+          <div className="flex w-full items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-muted-foreground text-sm uppercase">or continue with</span>
+            <Separator className="flex-1" />
+          </div>
 
           <AuthButtons isPending={isPending} />
         </Field>

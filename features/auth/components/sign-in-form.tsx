@@ -1,10 +1,13 @@
 "use client";
 
+import { useAuthActions } from "@convex-dev/auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConvexError } from "convex/values";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,11 +17,14 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthButtons } from "@/features/auth/components/auth-buttons";
+import { PasswordAuthFlow } from "@/features/auth/types";
 import { SignInFormData, signInSchema } from "@/features/auth/validators";
 
 export function SignInForm() {
-  const isPending = false; // Replace with actual pending state from your authentication logic
+  const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
+  const { signIn } = useAuthActions();
+  const flow: PasswordAuthFlow = "signIn";
 
   const form = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
@@ -29,12 +35,29 @@ export function SignInForm() {
     mode: "onSubmit",
   });
 
-  const onSubmit = async (data: SignInFormData) => {
-    console.log("Form Data:", data);
+  const onSubmit = (formData: SignInFormData) => {
+    startTransition(async () => {
+      try {
+        const { email, password } = formData;
+        await signIn("password", { email, password, flow });
+        // Reset the form after successful sign-in to clear the input fields
+        form.reset();
+        toast.success("Signed in successfully");
+      } catch (error) {
+        let errorMessage: string;
+        if (error instanceof ConvexError && error.data === "INVALID_PASSWORD") {
+          errorMessage = "Invalid password - check the requirements and try again.";
+        } else {
+          errorMessage = "Failed to sign in. Please check your credentials and try again.";
+        }
+
+        toast.error(errorMessage);
+      }
+    });
   };
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-xl">Sign In</CardTitle>
         <CardDescription>Enter your credentials to access your account.</CardDescription>
@@ -67,7 +90,12 @@ export function SignInForm() {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <div className="flex items-center justify-between">
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <Link href="/forgot-password" className="text-sm font-medium text-sky-700 hover:underline">
+                      Forgot Password?
+                    </Link>
+                  </div>
                   <InputGroup>
                     <InputGroupInput
                       {...field}
@@ -94,14 +122,6 @@ export function SignInForm() {
                 </Field>
               )}
             />
-
-            <div className="text-right">
-              <p className="text-muted-foreground text-sm">
-                <Link href="/forgot-password" className="font-medium text-sky-700 hover:underline">
-                  Forgot Password?
-                </Link>
-              </p>
-            </div>
           </FieldGroup>
         </form>
       </CardContent>
@@ -112,7 +132,11 @@ export function SignInForm() {
             {isPending ? "Signing In..." : "Sign In"}
           </Button>
 
-          <Separator />
+          <div className="flex w-full items-center gap-4">
+            <Separator className="flex-1" />
+            <span className="text-muted-foreground text-sm uppercase">or continue with</span>
+            <Separator className="flex-1" />
+          </div>
 
           <AuthButtons isPending={isPending} />
         </Field>

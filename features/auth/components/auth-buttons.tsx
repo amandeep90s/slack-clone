@@ -17,16 +17,28 @@ export function AuthButtons({ isPending = false }: AuthButtonsProps) {
   };
 
   return (
-    <>
-      <Button type="button" variant="outline" onClick={() => void onAuthProviderSignIn("google")} disabled={isPending}>
-        <FcGoogle className="size-5" />
-        Continue with Google
+    <div className="flex w-full flex-col items-center justify-center gap-4 md:flex-row">
+      <Button
+        type="button"
+        variant="outline"
+        className="flex-1"
+        onClick={() => void onAuthProviderSignIn("github")}
+        disabled={isPending}
+      >
+        <FaGithub className="size-5" />
+        Github
       </Button>
 
-      <Button type="button" variant="outline" onClick={() => void onAuthProviderSignIn("github")} disabled={isPending}>
-        <FaGithub className="size-5" />
-        Continue with Github
+      <Button
+        type="button"
+        variant="outline"
+        className="flex-1"
+        onClick={() => void onAuthProviderSignIn("google")}
+        disabled={isPending}
+      >
+        <FcGoogle className="size-5" />
+        Google
       </Button>
-    </>
+    </div>
   );
 }

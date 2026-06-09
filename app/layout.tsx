@@ -4,6 +4,7 @@ import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
 import { ConvexClientProvider } from "@/components/web/convex-client-provider";
 import { ThemeProvider } from "@/components/web/theme-provider";
 
@@ -36,7 +37,10 @@ export default function RootLayout({
       >
         <body className="flex min-h-full flex-col">
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <ConvexClientProvider>{children}</ConvexClientProvider>
+            <ConvexClientProvider>
+              {children}
+              <Toaster position="bottom-center" />
+            </ConvexClientProvider>
           </ThemeProvider>
         </body>
       </html>

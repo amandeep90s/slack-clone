@@ -46,7 +46,7 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-xl">Forgot Password</CardTitle>
         <CardDescription>
@@ -87,7 +87,7 @@ export function ForgotPasswordForm() {
         </Field>
         <p className="text-muted-foreground text-sm">
           Remembered your password?{" "}
-          <Link href="/sign-in" className="text-primary hover:underline">
+          <Link href="/sign-in" className="font-medium text-sky-700 hover:underline">
             Sign in
           </Link>
         </p>
