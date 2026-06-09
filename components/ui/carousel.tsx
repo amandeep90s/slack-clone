@@ -214,5 +214,4 @@ function CarouselNext({
   );
 }
 
-export { Carousel, type CarouselApi,CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useCarousel };
-
+export { Carousel, type CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, useCarousel };

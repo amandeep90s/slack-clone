@@ -1,23 +1,16 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { ForgotPasswordFormData, forgotPasswordSchema } from '@/features/auth/validators';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
+import { ForgotPasswordFormData, forgotPasswordSchema } from "@/features/auth/validators";
 
 export function ForgotPasswordForm() {
   const isPending = false; // Replace with actual pending state from your authentication logic
@@ -25,12 +18,12 @@ export function ForgotPasswordForm() {
 
   const form = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: '' },
-    mode: 'onSubmit',
+    defaultValues: { email: "" },
+    mode: "onSubmit",
   });
 
   const onSubmit = (data: ForgotPasswordFormData) => {
-    console.log('Form Data:', data);
+    console.log("Form Data:", data);
   };
 
   if (submitted) {
@@ -39,8 +32,8 @@ export function ForgotPasswordForm() {
         <CardHeader>
           <CardTitle className="text-xl">Check your email</CardTitle>
           <CardDescription>
-            If an account with that email exists, we&apos;ve sent a link to reset your password. The
-            link expires in 1 hour.
+            If an account with that email exists, we&apos;ve sent a link to reset your password. The link expires in 1
+            hour.
           </CardDescription>
         </CardHeader>
         <CardFooter>
@@ -89,11 +82,11 @@ export function ForgotPasswordForm() {
         <Field orientation="responsive">
           <Button type="submit" form="forgot-password-form" disabled={isPending}>
             {isPending && <Spinner data-icon="inline-start" />}
-            {isPending ? 'Sending...' : 'Send Reset Link'}
+            {isPending ? "Sending..." : "Send Reset Link"}
           </Button>
         </Field>
         <p className="text-muted-foreground text-sm">
-          Remembered your password?{' '}
+          Remembered your password?{" "}
           <Link href="/sign-in" className="text-primary hover:underline">
             Sign in
           </Link>
