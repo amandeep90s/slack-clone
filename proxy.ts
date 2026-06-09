@@ -1,17 +1,23 @@
-import { convexAuthNextjsMiddleware } from "@convex-dev/auth/nextjs/server";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import {
+  convexAuthNextjsMiddleware,
+  createRouteMatcher,
+  nextjsMiddlewareRedirect,
+} from "@convex-dev/auth/nextjs/server";
 
-// This function can be marked `async` if using `await` inside
-export function proxy(request: NextRequest) {
-  return NextResponse.redirect(new URL("/home", request.url));
-}
+const isPublicRoute = createRouteMatcher(["/sign-in", "/sign-up", "/forgot-password", "/reset-password"]);
+const isProtectedRoute = createRouteMatcher(["/"]);
 
-// Alternatively, you can use a default export:
-// export default function proxy(request: NextRequest) { ... }
+export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
+  if (isPublicRoute(request) && (await convexAuth.isAuthenticated())) {
+    return nextjsMiddlewareRedirect(request, "/");
+  }
+  if (isProtectedRoute(request) && !(await convexAuth.isAuthenticated())) {
+    return nextjsMiddlewareRedirect(request, "/sign-in");
+  }
+});
 
 export const config = {
+  // The following matcher runs middleware on all routes
+  // except static assets.
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
-
-export default convexAuthNextjsMiddleware();

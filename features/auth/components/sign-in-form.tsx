@@ -5,8 +5,6 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FaGithub } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { AuthButtons } from "@/features/auth/components/auth-buttons";
 import { SignInFormData, signInSchema } from "@/features/auth/validators";
 
 export function SignInForm() {
@@ -115,15 +114,7 @@ export function SignInForm() {
 
           <Separator />
 
-          <Button type="button" variant="outline" form="sign-in-form" disabled={isPending}>
-            <FcGoogle className="size-5" />
-            Continue with Google
-          </Button>
-
-          <Button type="button" variant="outline" form="sign-in-form" disabled={isPending}>
-            <FaGithub className="size-5" />
-            Continue with Github
-          </Button>
+          <AuthButtons isPending={isPending} />
         </Field>
 
         <p className="text-muted-foreground text-sm">
