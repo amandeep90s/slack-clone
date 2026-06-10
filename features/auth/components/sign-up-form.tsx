@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ConvexError } from "convex/values";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ export function SignUpForm() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const { signIn } = useAuthActions();
+  const router = useRouter();
   const flow: PasswordAuthFlow = "signUp";
 
   const form = useForm<SignUpFormData>({
@@ -46,6 +48,7 @@ export function SignUpForm() {
         // Reset the form after successful sign-up to clear the input fields
         form.reset();
         toast.success("Account created successfully");
+        router.push("/");
       } catch (error) {
         let errorMessage: string;
         if (error instanceof ConvexError && error.data === "INVALID_PASSWORD") {

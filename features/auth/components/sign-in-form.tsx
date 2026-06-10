@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ConvexError } from "convex/values";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ export function SignInForm() {
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const { signIn } = useAuthActions();
+  const router = useRouter();
   const flow: PasswordAuthFlow = "signIn";
 
   const form = useForm<SignInFormData>({
@@ -43,6 +45,7 @@ export function SignInForm() {
         // Reset the form after successful sign-in to clear the input fields
         form.reset();
         toast.success("Signed in successfully");
+        router.push("/");
       } catch (error) {
         let errorMessage: string;
         if (error instanceof ConvexError && error.data === "INVALID_PASSWORD") {
